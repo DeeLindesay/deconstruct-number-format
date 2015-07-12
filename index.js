@@ -68,6 +68,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
   rightSpaces = format.length - format.trimRight().length
   format = format.trimRight();
 
+  var mask= format;
   //find the decimal character and parts of format
 
   var decimalChar, decimalsPart = '', integerPart = '', decimalsSeparator, integerSeparator;
@@ -117,6 +118,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     prefix: prefix,
     leftSpaces: leftSpaces,
     rightSpaces: rightSpaces,
+    mask: mask,
     decimalChar: decimalChar,
     integerSeparator: integerSeparator,
     decimalsSeparator: decimalsSeparator,
