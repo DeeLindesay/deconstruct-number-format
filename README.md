@@ -32,3 +32,4 @@ Notes:
 
 Does not work for:
 - structured reference numbers, eg 9999-9999
+- ignores and removes leading and trailing spaces (but retains those between pre/post fix and negative symbols etc)
