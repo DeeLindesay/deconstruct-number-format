@@ -6,14 +6,23 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
 
   var format= requiredFormat || '-9,999.90';
 
-
-  //find position and type of negative and contents of prefix and postfix text
-  format=format.trim();
-  var negativeType, negativeRightPos, negativeLeftPos, absFormat, prefix, postfix;
+  format=format.trim(); //ignore leading and trailing spaces
+  
+  // *********************************************************************************
+  // find position and type of negative and contents of prefix and postfix text
+  // *********************************************************************************
+  
+  var negativeType = '', negativeRightSymbol = null, negativeLeftSymbol = null,
+      negativeRightPos = -1, negativeLeftPos = -1, 
+      absFormat,
+      prefix = '', postfix = '';
+  
+  // brackets as negative
   if (/^([^()]+)?[(]([^09#]+)?[09#., ]+([^)]+)?[)](.+)?$/.exec(format)) {
     negativeType = 'brackets';
     negativeLeftPos = format.indexOf("(");
-    if (negativeLeftPos > 0) {
+    negativeLeftSymbol = '('
+    if (negativeLeftPos > 0) { //after prefix
       prefix = format.slice(0, negativeLeftPos);
     } else {
       prefix = format.search(/0|9|#/) > 0 ? format.slice(1, format.search(/0|9|#/)) : "";
@@ -21,36 +30,46 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     format = format.slice(prefix.length+1);
 
     negativeRightPos = format.indexOf(")");
-    if (negativeRightPos < format.length-1) {
+    negativeRightSymbol = ')'
+    if (negativeRightPos < format.length-1) { //before prefix
       postfix = format.slice(negativeRightPos+1);
       format = format.slice(0, negativeRightPos);
     } else {
-      postfix = format.search(/[^09#,. ]([^09#](.+)?)?[)]$/) > -1  ? format.slice(format.search(/[^09#,. ]([^09#](.+)?)?[)]$/), format.length-1) : "";
+      postfix = format.search(/[^09#,.]([^09#](.+)?)?[)]$/) > -1  ? format.slice(format.search(/[^09#,.]([^09#](.+)?)?[)]$/), format.length-1) : "";
       format = format.slice(0, format.length - postfix.length - 1);
       negativeRightPos = 0;
     }
 
   } else if (format.indexOf("-") === -1){
+    //positive values only
     negativeType = 'none';
+    prefix = format.search(/[.,]?[09#]/) > 0 ? format.slice(0, format.search(/[.,]?[09#]/)) : "";
+    format = format.slice(prefix.length);
+    postfix = format.search(/[^09#,.]([^09#]+|$)/) > -1  ? format.slice(format.search(/[^09#,.]([^09#]+|$)/)) : "";
+    format = format.slice(0, format.length-postfix.length);
 
   } else if (/^([^09#-]+)?-.+$/.exec(format)) {
+    //negative symbol to left of number (before or after prefix)
     negativeType = 'left';
     negativeLeftPos = format.indexOf("-");
-    if (negativeLeftPos > 0) {
+    negativeLeftSymbol = '-'
+    if (negativeLeftPos > 0) { //after prefix
       prefix = format.slice(0, negativeLeftPos);
     } else {
-      prefix = format.search(/0|9|#/) > 0 ? format.slice(1, format.search(/0|9|#/)) : "";
+      prefix = format.search(/[.,]?[09#]/) > 0 ? format.slice(1, format.search(/[.,]?[09#]/)) : "";
     }
     format = format.slice(prefix.length+1);
-    postfix = format.search(/[^09#,. ][^09#]?/) > -1  ? format.slice(format.search(/[^09#,. ][^09#]?/)) : "";
+    postfix = format.search(/[^09#,.]([^09#]+|$)/) > -1  ? format.slice(format.search(/[^09#,.]([^09#]+|$)/)) : "";
     format = format.slice(0, format.length-postfix.length);
 
   } else {
-    prefix = format.search(/0|9|#/) > 0 ? format.slice(0, format.search(/0|9|#/)) : "";
+    //negative symbol to right of number (before or after postfix)
+    prefix = format.search(/[.,]?[09#]/) > 0 ? format.slice(0, format.search(/[.,]?[09#]/)) : "";
     format = format.slice(prefix.length);
     negativeType = 'right';
+    negativeRightSymbol = '-'
     negativeRightPos = format.lastIndexOf("-");
-    if (negativeRightPos < format.length-1) {
+    if (negativeRightPos < format.length-1) { //before postfix
       postfix = format.slice(negativeRightPos+1);
       format = format.slice(0, negativeRightPos);
     } else {
@@ -60,25 +79,44 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     }
   }
 
-  //record and trim extra spaces
-  var leftSpaces, rightSpaces
+  // *********************************************************************************
+  //include spaces with negative symbols
+  // *********************************************************************************
 
-  leftSpaces = format.length - format.trimLeft().length
-  format = format.trimLeft();
-  rightSpaces = format.length - format.trimRight().length
-  format = format.trimRight();
+  while (negativeLeftPos === 0 && prefix && prefix[0] === ' ') {
+    negativeLeftSymbol = negativeLeftSymbol + ' ';
+    prefix = prefix.slice(1);
+  }
 
-  var mask= format;
-  //find the decimal character and parts of format
+  while (negativeRightPos === 0 && postfix && postfix[postfix.length-1] === ' ') {
+    negativeRightSymbol = ' ' + negativeRightSymbol;
+    postfix = postfix.slice(0, postfix.length-1);
+  }
 
-  var decimalChar, decimalsPart = '', integerPart = '', decimalsSeparator, integerSeparator;
-  if (format.search(/[.,]([09# ]+)?$/) > 0) {
-    decimalChar = format[format.search(/[.,]([09# ]+)?$/)];
-    if (format.indexOf(decimalChar) !== format.lastIndexOf(decimalChar)) {
-      decimalChar = decimalChar === ',' ? decimalChar = '.' : ','
-      if (format.indexOf(decimalChar) !== format.lastIndexOf(decimalChar)) {decimalChar = null}
-    };
+  while (format.length - format.trimLeft().length > 0) {
+    negativeLeftSymbol = negativeLeftSymbol + ' ';
+    format = format.slice(1);
+  }
 
+  while (format.length - format.trimRight().length > 0) {
+    negativeRightSymbol = ' ' + negativeRightSymbol;
+    format = format.slice(0, format.length-1);
+  }
+
+  var absMask = format;
+
+  // *********************************************************************************
+  //find the decimal character and parts of absolute format
+  // *********************************************************************************
+
+  var decimalChar = null, decimalsPart = '', integerPart = '', decimalsSeparator = null, integerSeparator = null;
+  
+  if (format.indexOf('.') > -1) {
+    decimalChar = ".";
+  } else {
+    if (format.indexOf(',') > -1 && format.indexOf(',') === format.lastIndexOf(',')) {
+      decimalChar = ',';
+    }
   }
 
   if (decimalChar) {
@@ -100,25 +138,31 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     decimalsPart = decimalsPart.replace(/[, ]/g, "");
   }
 
-
   if ((integerPart.length && !(/^[09#]+$/).exec(integerPart)) || (decimalsPart.length && !(/^[09#]+$/).exec(decimalsPart))) {return false};
 
+  // *********************************************************************************
   //resolve length and padding
+  // *********************************************************************************
+
   var padLeft, maxLeft, padRight, maxRight;
-  padLeft = integerPart.indexOf("0") >= 0 ? integerPart.length - integerPart.indexOf("0") : null;
-  maxLeft = integerPart[0] === "0" || integerPart[0] === "9" ? integerPart.length : null;
-  padRight = decimalsPart.indexOf("0") >= 0 ? decimalsPart.lastIndexOf("0")+1 : null;
-  maxRight = decimalsPart.length <= 0 ? 0 : (decimalsPart[decimalsPart.length-1] === "0" || decimalsPart[decimalsPart.length-1] === "9" ? decimalsPart.length : null);
+  padLeft = integerPart.indexOf("0") >= 0 ? integerPart.length - integerPart.indexOf("0") : -1;
+  maxLeft = integerPart.length === 0 ||integerPart[0] === "0" || integerPart[0] === "9" ? integerPart.length : -1;
+  padRight = decimalsPart.indexOf("0") >= 0 ? decimalsPart.lastIndexOf("0")+1 : -1;
+  maxRight = decimalsPart.length === 0 || decimalsPart[decimalsPart.length-1] === "0" || decimalsPart[decimalsPart.length-1] === "9" ? decimalsPart.length : -1;
+
+  // *********************************************************************************
+  // output
+  // *********************************************************************************
 
   var deconstructedFormat = {
     negativeType: negativeType,
-    negativeRightPos: negativeRightPos,
     negativeLeftPos: negativeLeftPos,
+    negativeRightPos: negativeRightPos,
+    negativeLeftSymbol: negativeLeftSymbol,
+    negativeRightSymbol: negativeRightSymbol,
     postfix: postfix,
     prefix: prefix,
-    leftSpaces: leftSpaces,
-    rightSpaces: rightSpaces,
-    mask: mask,
+    absMask: absMask,
     decimalChar: decimalChar,
     integerSeparator: integerSeparator,
     decimalsSeparator: decimalsSeparator,
