@@ -19,8 +19,8 @@ Returns:
 - negativeLeftSymbol: left hand negative symbol (may include trailing spaces), eg '(', '( ', '- '
 - negativeRightSymbol: right hand negative symbol (may include leading spaces), eg ')', ' )', ' -'
 - decimalChar: character repesenting decimal (. or ,)
-- integerSeparator: separator of thousands (space or ,); null if no separator
-- decimalsSeparator: separator of thousanths (space or ,); null if no separator
+- integerSeparator: separator of thousands (space or ,); empty string if no separator
+- decimalsSeparator: separator of thousanths (space or ,); empty string if no separator
 - padLeft: padding front of number, based on first postition of a zero; -1 = no padding
 - maxLeft: max places permitted before the dp, based on 9 or 0 in first position; -1 = no max
 - padRight: zero padding required to right of dp, based on last postition of a zero; -1 = no padding

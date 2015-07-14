@@ -12,7 +12,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
   // find position and type of negative and contents of prefix and postfix text
   // *********************************************************************************
   
-  var negativeType = '', negativeRightSymbol = null, negativeLeftSymbol = null,
+  var negativeType = '', negativeRightSymbol = '', negativeLeftSymbol = '',
       negativeRightPos = -1, negativeLeftPos = -1, 
       absFormat,
       prefix = '', postfix = '';
@@ -109,7 +109,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
   //find the decimal character and parts of absolute format
   // *********************************************************************************
 
-  var decimalChar = null, decimalsPart = '', integerPart = '', decimalsSeparator = null, integerSeparator = null;
+  var decimalChar = '', decimalsPart = '', integerPart = '', decimalsSeparator = '', integerSeparator = '';
   
   if (format.indexOf('.') > -1) {
     decimalChar = ".";
