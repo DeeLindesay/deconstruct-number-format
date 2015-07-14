@@ -139,6 +139,31 @@ test('deconstruct - £9,999.00 /m', function () {
   assert.deepEqual(actual, expected);
 });
 
+
+test('deconstruct - £9,999.00 /m\u00B2', function () {
+  var actual = deconstruct('- £9,999.00 /m\u00B2');
+  var expected = {
+    negativeType: 'left',
+    negativeLeftPos: 0,
+    negativeRightPos: -1,
+    negativeLeftSymbol: '- ',
+    negativeRightSymbol: '',
+    postfix: ' /m\u00B2',
+    prefix: '£',
+    absMask: '9,999.00',
+    decimalChar: '.',
+    integerSeparator: ',',
+    decimalsSeparator: '',
+    padLeft: -1,
+    maxLeft: 4,
+    padRight: 2,
+    maxRight: 2
+  };
+  assert.deepEqual(actual, expected);
+});
+
+
+
 test('deconstruct - £9,999.00m', function () {
   var actual = deconstruct('- £9,999.00m');
   var expected = {
