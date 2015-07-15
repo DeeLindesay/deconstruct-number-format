@@ -18,7 +18,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
       prefix = '', postfix = '';
   
   // brackets as negative
-  if (/^([^()]+)?[(]([^09#]+)?[09#., ]+([^)]+)?[)](.+)?$/.exec(format)) {
+  if (/^([^()]+)?[(]([^09#]+)?[09#., ]+([^)]+)?[)](.+)?$/.test(format)) {
     negativeType = 'brackets';
     negativeLeftPos = format.indexOf("(");
     negativeLeftSymbol = '('
@@ -48,7 +48,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     postfix = format.search(/[^09#,.]([^09#]+|$)/) > -1  ? format.slice(format.search(/[^09#,.]([^09#]+|$)/)) : "";
     format = format.slice(0, format.length-postfix.length);
 
-  } else if (/^([^09#-]+)?-.+$/.exec(format)) {
+  } else if (/^([^09#-]+)?-.+$/.test(format)) {
     //negative symbol to left of number (before or after prefix)
     negativeType = 'left';
     negativeLeftPos = format.indexOf("-");
@@ -162,7 +162,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     decimalsPart = decimalsPart.replace(/[., ]/g, "");
   }
 
-  if ((integerPart.length && !(/^[09#]+$/).exec(integerPart)) || (decimalsPart.length && !(/^[09#]+$/).exec(decimalsPart))) {return false};
+  if ((integerPart.length && !(/^[09#]+$/).test(integerPart)) || (decimalsPart.length && !(/^[09#]+$/).test(decimalsPart))) {return false};
 
   // *********************************************************************************
   //resolve length and padding
