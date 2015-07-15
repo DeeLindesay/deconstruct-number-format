@@ -5,10 +5,10 @@ Accepts:
 - negative signs before or after prefix text
 - brackets as negative signs
 - prefix and postfix texts
-- . or , as decimal point
-- space or , as thousand separators
-- space or , as thousanths separators
-- #,9 or 0 as number holders
+- `.` or `,` as decimal point
+- space or `.` or `,` as thousand separators
+- space or `.` or `,` as thousanths separators
+- `#`, `9` or `0` as number place holders
 
 Returns:
 - negativeType: 'right', 'left', 'brackets', 'none'
@@ -19,15 +19,32 @@ Returns:
 - negativeLeftSymbol: left hand negative symbol (may include trailing spaces), eg '(', '( ', '- '
 - negativeRightSymbol: right hand negative symbol (may include leading spaces), eg ')', ' )', ' -'
 - decimalChar: character repesenting decimal (. or ,)
-- integerSeparator: separator of thousands (space or ,); empty string if no separator
-- decimalsSeparator: separator of thousanths (space or ,); empty string if no separator
+- integerSeparator: separator of thousands (space or . or ,); empty string if no separator
+- decimalsSeparator: separator of thousanths (space or . or ,); empty string if no separator
 - padLeft: padding front of number, based on first postition of a zero; -1 = no padding
-- maxLeft: max places permitted before the dp, based on 9 or 0 in first position; -1 = no max
+- maxLeft: max places permitted before the dp, based on 9 or 0 as the first number holder; -1 = no max
 - padRight: zero padding required to right of dp, based on last postition of a zero; -1 = no padding
-- maxRight: max places permitted after the dp, based on 0 or 9 in last position, can be 0 (integer only); -1 = no max
+- maxRight: max places permitted after the dp, based on 0 or 9 as the last number holder, can be 0 (integer only); -1 = no max
 
-Notes:
-- For numbers such as 8,345 where the comma is a thousands separator use a trailing decimal point eg 9,999. otherwise ',' will be interpreted as the decimal point.
+Notes on decimal points/thousands separators:
+If a format ends in a . or , then this will be taken as the decimal character UNLESS the same character is used elsewhere so:
+- `#,###.`  results in decimalChar = '.', thousands separator = ','
+- `#.###,`  results in decimalChar = ',', thousands separator = '.'
+
+If a format only has one of ',' or '.' and the character only appears once it is taken as the decimal point
+- `#,###`  results in decimalChar = ','
+- `#.###`  results in decimalChar = '.'
+
+If the character appears twice it is a separator
+- `#,###,###`  results in decimalChar = '.', thousands separator = ','
+- `#.###.###`  results in decimalChar = ',', thousands separator = '.'
+
+When in doubt '.' is taken as the separator, so 
+- #.###,# results in decimalChar = '.', thousandths separator = ','
+To create the same structure with decimalChar as ',', just add a '.' at start or end or extend expression eg
+- `.#.###,#`
+- `#.###,#.`
+- `#.###.###,#`
 
 
 Does not work for:

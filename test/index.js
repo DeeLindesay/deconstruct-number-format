@@ -6,7 +6,7 @@ var assert = require('assert');
 
 console.log(deconstruct);
 
-test('deconstruct $(# ###,### #) per year', function () {
+test('1 deconstruct $(# ###,### #) per year', function () {
   var actual = deconstruct('$(# ###,### #) per year');
   var expected = {
     negativeType: 'brackets',
@@ -29,7 +29,7 @@ test('deconstruct $(# ###,### #) per year', function () {
 });
 
 
-test('deconstruct $( 9 ###,### 0 ) per month', function () {
+test('2 deconstruct $( 9 ###,### 0 ) per month', function () {
   var actual = deconstruct('$( 9 ###,### 0 ) per month');
   var expected = {
     negativeType: 'brackets',
@@ -51,7 +51,7 @@ test('deconstruct $( 9 ###,### 0 ) per month', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct ( $0##.##0 )/m', function () {
+test('3 deconstruct ( $0##.##0 )/m', function () {
   var actual = deconstruct('( $0##.##0 )/m');
   var expected = {
     negativeType: 'brackets',
@@ -73,7 +73,7 @@ test('deconstruct ( $0##.##0 )/m', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct (#,###. years)', function () {
+test('4 deconstruct (#,###. years)', function () {
   var actual = deconstruct('(#,###. years)');
   var expected = {
     negativeType: 'brackets',
@@ -95,7 +95,7 @@ test('deconstruct (#,###. years)', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct (#,##0.0#)', function () {
+test('5 deconstruct (#,##0.0#)', function () {
   var actual = deconstruct('(#,##0.0#)');
   var expected = {
     negativeType: 'brackets',
@@ -117,7 +117,7 @@ test('deconstruct (#,##0.0#)', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct - £9,999.00 /m', function () {
+test('6 deconstruct - £9,999.00 /m', function () {
   var actual = deconstruct('- £9,999.00 /m');
   var expected = {
     negativeType: 'left',
@@ -140,7 +140,7 @@ test('deconstruct - £9,999.00 /m', function () {
 });
 
 
-test('deconstruct - £9,999.00 /m\u00B2', function () {
+test('7 deconstruct - £9,999.00 /m\u00B2', function () {
   var actual = deconstruct('- £9,999.00 /m\u00B2');
   var expected = {
     negativeType: 'left',
@@ -164,7 +164,7 @@ test('deconstruct - £9,999.00 /m\u00B2', function () {
 
 
 
-test('deconstruct - £9,999.00m', function () {
+test('8 deconstruct - £9,999.00m', function () {
   var actual = deconstruct('- £9,999.00m');
   var expected = {
     negativeType: 'left',
@@ -186,7 +186,7 @@ test('deconstruct - £9,999.00m', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct £ - 9,999.09 (/m)', function () {
+test('9 deconstruct £ - 9,999.09 (/m)', function () {
   var actual = deconstruct('£ - 9,999.09(/m)');
   var expected = {
     negativeType: 'left',
@@ -209,7 +209,7 @@ test('deconstruct £ - 9,999.09 (/m)', function () {
 });
 
 
-test('deconstruct -9,999.00', function () {
+test('10 deconstruct -9,999.00', function () {
   var actual = deconstruct('-9,999.00');
   var expected = {
     negativeType: 'left',
@@ -231,7 +231,30 @@ test('deconstruct -9,999.00', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct £9,999.00m -', function () {
+
+test('11 deconstruct 9,999.00 - s', function () {
+  var actual = deconstruct('9,999.00 - s');
+  var expected = {
+    negativeType: 'right',
+    negativeLeftPos: -1,
+    negativeRightPos: 9,
+    negativeLeftSymbol: '',
+    negativeRightSymbol: ' -',
+    postfix: ' s',
+    prefix: '',
+    absMask: '9,999.00',
+    decimalChar: '.',
+    integerSeparator: ',',
+    decimalsSeparator: '',
+    padLeft: -1,
+    maxLeft: 4,
+    padRight: 2,
+    maxRight: 2
+  };
+  assert.deepEqual(actual, expected);
+});
+
+test('12 deconstruct £9,999.00m -', function () {
   var actual = deconstruct('£9,999.00m -');
   var expected = {
     negativeType: 'right',
@@ -253,7 +276,7 @@ test('deconstruct £9,999.00m -', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct £9,999.00 /m -', function () {
+test('13 deconstruct £9,999.00 /m -', function () {
   var actual = deconstruct('£9,999.00 /m -');
   var expected = {
     negativeType: 'right',
@@ -276,14 +299,14 @@ test('deconstruct £9,999.00 /m -', function () {
 });
 
 
-test('deconstruct £ 9,999.09 - (/m)', function () {
-  var actual = deconstruct('£ 9,999.09 - (/m)');
+test('14 deconstruct £ 9,999.09  - (/m)', function () {
+  var actual = deconstruct('£ 9,999.09  - (/m)');
   var expected = {
     negativeType: 'right',
     negativeLeftPos: -1,
-    negativeRightPos: 9,
+    negativeRightPos: 10,
     negativeLeftSymbol: '',
-    negativeRightSymbol: ' -',
+    negativeRightSymbol: '  -',
     postfix: ' (/m)',
     prefix: '£ ',
     absMask: '9,999.09',
@@ -299,7 +322,7 @@ test('deconstruct £ 9,999.09 - (/m)', function () {
 });
 
 
-test('deconstruct 9,999.00-', function () {
+test('15 deconstruct 9,999.00-', function () {
   var actual = deconstruct('9,999.00-');
   var expected = {
     negativeType: 'right',
@@ -321,7 +344,7 @@ test('deconstruct 9,999.00-', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct £9,999. /m.', function () {
+test('16 deconstruct £9,999. /m.', function () {
   var actual = deconstruct('£9,999. /m.');
   var expected = {
     negativeType: 'none',
@@ -344,7 +367,7 @@ test('deconstruct £9,999. /m.', function () {
 });
 
 
-test('deconstruct £ #,##0.09 (/m)', function () {
+test('17 deconstruct £ #,##0.09 (/m)', function () {
   var actual = deconstruct('£ #,##0.09 (/m)');
   var expected = {
     negativeType: 'none',
@@ -367,7 +390,7 @@ test('deconstruct £ #,##0.09 (/m)', function () {
 });
 
 
-test('deconstruct 9,999.00m', function () {
+test('18 deconstruct 9,999.00m', function () {
   var actual = deconstruct('9,999.00m');
   var expected = {
     negativeType: 'none',
@@ -389,7 +412,7 @@ test('deconstruct 9,999.00m', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct 9,999.00 m', function () {
+test('19 deconstruct 9,999.00 m', function () {
   var actual = deconstruct('9,999.00 m');
   var expected = {
     negativeType: 'none',
@@ -411,7 +434,7 @@ test('deconstruct 9,999.00 m', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct 9,999,000', function () {
+test('20 deconstruct 9,999,000', function () {
   var actual = deconstruct('9,999,000');
   var expected = {
     negativeType: 'none',
@@ -422,7 +445,7 @@ test('deconstruct 9,999,000', function () {
     postfix: '',
     prefix: '',
     absMask: '9,999,000',
-    decimalChar: '',
+    decimalChar: '.',
     integerSeparator: ',',
     decimalsSeparator: '',
     padLeft: 3,
@@ -433,7 +456,7 @@ test('deconstruct 9,999,000', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct 0,999', function () {
+test('21 deconstruct 0,999', function () {
   var actual = deconstruct('0,999');
   var expected = {
     negativeType: 'none',
@@ -455,8 +478,8 @@ test('deconstruct 0,999', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct 0,999 999', function () {
-  var actual = deconstruct('0,999 999');
+test('22 deconstruct 0.999', function () {
+  var actual = deconstruct('0.999');
   var expected = {
     negativeType: 'none',
     negativeLeftPos: -1,
@@ -465,41 +488,20 @@ test('deconstruct 0,999 999', function () {
     negativeRightSymbol: '',
     postfix: '',
     prefix: '',
-    absMask: '0,999 999',
-    decimalChar: ',',
+    absMask: '0.999',
+    decimalChar: '.',
     integerSeparator: '',
-    decimalsSeparator: ' ',
+    decimalsSeparator: '',
     padLeft: 1,
     maxLeft: 1,
-    padRight: -1,
-    maxRight: 6
-  };
-  assert.deepEqual(actual, expected);
-});
-
-test('deconstruct 0,999.999', function () {
-  var actual = deconstruct('0,999.999');
-  var expected = {
-    negativeType: 'none',
-    negativeLeftPos: -1,
-    negativeRightPos: -1,
-    negativeLeftSymbol: '',
-    negativeRightSymbol: '',
-    postfix: '',
-    prefix: '',
-    absMask: '0,999.999',
-    decimalChar: '.',
-    integerSeparator: ',',
-    decimalsSeparator: '',
-    padLeft: 4,
-    maxLeft: 4,
     padRight: -1,
     maxRight: 3
   };
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct 0,999.', function () {
+
+test('23 deconstruct 0,999.', function () {
   var actual = deconstruct('0,999.');
   var expected = {
     negativeType: 'none',
@@ -521,7 +523,97 @@ test('deconstruct 0,999.', function () {
   assert.deepEqual(actual, expected);
 });
 
-test('deconstruct .###,###', function () {
+test('24 deconstruct 0.999,', function () {
+  var actual = deconstruct('0.999,');
+  var expected = {
+    negativeType: 'none',
+    negativeLeftPos: -1,
+    negativeRightPos: -1,
+    negativeLeftSymbol: '',
+    negativeRightSymbol: '',
+    postfix: '',
+    prefix: '',
+    absMask: '0.999,',
+    decimalChar: ',',
+    integerSeparator: '.',
+    decimalsSeparator: '',
+    padLeft: 4,
+    maxLeft: 4,
+    padRight: -1,
+    maxRight: 0
+  };
+  assert.deepEqual(actual, expected);
+});
+
+
+
+test('25 deconstruct 0,999 999', function () {
+  var actual = deconstruct('0,999 999');
+  var expected = {
+    negativeType: 'none',
+    negativeLeftPos: -1,
+    negativeRightPos: -1,
+    negativeLeftSymbol: '',
+    negativeRightSymbol: '',
+    postfix: '',
+    prefix: '',
+    absMask: '0,999 999',
+    decimalChar: ',',
+    integerSeparator: '',
+    decimalsSeparator: ' ',
+    padLeft: 1,
+    maxLeft: 1,
+    padRight: -1,
+    maxRight: 6
+  };
+  assert.deepEqual(actual, expected);
+});
+
+test('26 deconstruct 0,999.999', function () {
+  var actual = deconstruct('0,999.999');
+  var expected = {
+    negativeType: 'none',
+    negativeLeftPos: -1,
+    negativeRightPos: -1,
+    negativeLeftSymbol: '',
+    negativeRightSymbol: '',
+    postfix: '',
+    prefix: '',
+    absMask: '0,999.999',
+    decimalChar: '.',
+    integerSeparator: ',',
+    decimalsSeparator: '',
+    padLeft: 4,
+    maxLeft: 4,
+    padRight: -1,
+    maxRight: 3
+  };
+  assert.deepEqual(actual, expected);
+});
+
+test('27 deconstruct 0,999.', function () {
+  var actual = deconstruct('0,999.');
+  var expected = {
+    negativeType: 'none',
+    negativeLeftPos: -1,
+    negativeRightPos: -1,
+    negativeLeftSymbol: '',
+    negativeRightSymbol: '',
+    postfix: '',
+    prefix: '',
+    absMask: '0,999.',
+    decimalChar: '.',
+    integerSeparator: ',',
+    decimalsSeparator: '',
+    padLeft: 4,
+    maxLeft: 4,
+    padRight: -1,
+    maxRight: 0
+  };
+  assert.deepEqual(actual, expected);
+});
+
+test('28 deconstruct .###,###', function () {
   var actual = deconstruct('.###,###');
   var expected = {
     negativeType: 'none',
@@ -537,6 +629,72 @@ test('deconstruct .###,###', function () {
     decimalsSeparator: ',',
     padLeft: -1,
     maxLeft: 0,
+    padRight: -1,
+    maxRight: -1
+  };
+  assert.deepEqual(actual, expected);
+});
+
+test('28 deconstruct #.###,#', function () {
+  var actual = deconstruct('#.###,#');
+  var expected = {
+    negativeType: 'none',
+    negativeLeftPos: -1,
+    negativeRightPos: -1,
+    negativeLeftSymbol: '',
+    negativeRightSymbol: '',
+    postfix: '',
+    prefix: '',
+    absMask: '#.###,#',
+    decimalChar: '.',
+    integerSeparator: '',
+    decimalsSeparator: ',',
+    padLeft: -1,
+    maxLeft: -1,
+    padRight: -1,
+    maxRight: -1
+  };
+  assert.deepEqual(actual, expected);
+});
+
+test('28 deconstruct #.###,#.', function () {
+  var actual = deconstruct('#.###,#.');
+  var expected = {
+    negativeType: 'none',
+    negativeLeftPos: -1,
+    negativeRightPos: -1,
+    negativeLeftSymbol: '',
+    negativeRightSymbol: '',
+    postfix: '',
+    prefix: '',
+    absMask: '#.###,#.',
+    decimalChar: ',',
+    integerSeparator: '.',
+    decimalsSeparator: '',
+    padLeft: -1,
+    maxLeft: -1,
+    padRight: -1,
+    maxRight: -1
+  };
+  assert.deepEqual(actual, expected);
+});
+
+test('29 deconstruct .#.###,#', function () {
+  var actual = deconstruct('.#.###,#');
+  var expected = {
+    negativeType: 'none',
+    negativeLeftPos: -1,
+    negativeRightPos: -1,
+    negativeLeftSymbol: '',
+    negativeRightSymbol: '',
+    postfix: '',
+    prefix: '',
+    absMask: '.#.###,#',
+    decimalChar: ',',
+    integerSeparator: '.',
+    decimalsSeparator: '',
+    padLeft: -1,
+    maxLeft: -1,
     padRight: -1,
     maxRight: -1
   };

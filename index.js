@@ -35,7 +35,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
       postfix = format.slice(negativeRightPos+1);
       format = format.slice(0, negativeRightPos);
     } else {
-      postfix = format.search(/[^09#,.]([^09#](.+)?)?[)]$/) > -1  ? format.slice(format.search(/[^09#,.]([^09#](.+)?)?[)]$/), format.length-1) : "";
+      postfix = format.search(/[^09#,.]([^09#](.+)?)?[)]$/) > -1  ? format.slice(format.search(/[^09#,.]([^09#](.+)?)?[)]$/), -1) : "";
       format = format.slice(0, format.length - postfix.length - 1);
       negativeRightPos = 0;
     }
@@ -56,7 +56,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     if (negativeLeftPos > 0) { //after prefix
       prefix = format.slice(0, negativeLeftPos);
     } else {
-      prefix = format.search(/[.,]?[09#]/) > 0 ? format.slice(1, format.search(/[.,]?[09#]/)) : "";
+      prefix = format.search(/[09#]/) > 0 ? format.slice(1, format.search(/[09#]/)) : "";
     }
     format = format.slice(prefix.length+1);
     postfix = format.search(/[^09#,.]([^09#]+|$)/) > -1  ? format.slice(format.search(/[^09#,.]([^09#]+|$)/)) : "";
@@ -64,7 +64,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
 
   } else {
     //negative symbol to right of number (before or after postfix)
-    prefix = format.search(/[.,]?[09#]/) > 0 ? format.slice(0, format.search(/[.,]?[09#]/)) : "";
+    prefix = format.search(/[09#]/) > 0 ? format.slice(0, format.search(/[09#]/)) : "";
     format = format.slice(prefix.length);
     negativeType = 'right';
     negativeRightSymbol = '-'
@@ -83,24 +83,28 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
   //include spaces with negative symbols
   // *********************************************************************************
 
+  //When negative is before prefix move spaces from start of prefix to end of negative symbol
   while (negativeLeftPos === 0 && prefix && prefix[0] === ' ') {
     negativeLeftSymbol = negativeLeftSymbol + ' ';
     prefix = prefix.slice(1);
   }
 
+  //When negative follows postfix move spaces end of postfix to start of negative symbol
   while (negativeRightPos === 0 && postfix && postfix[postfix.length-1] === ' ') {
     negativeRightSymbol = ' ' + negativeRightSymbol;
-    postfix = postfix.slice(0, postfix.length-1);
+    postfix = postfix.slice(0, -1);
   }
 
-  while (format.length - format.trimLeft().length > 0) {
+  //When negative follows prefix move spaces from start of format to end of negative symbol
+  while (negativeLeftPos > 0 && format.length && format[0] === ' ') {
     negativeLeftSymbol = negativeLeftSymbol + ' ';
     format = format.slice(1);
   }
 
-  while (format.length - format.trimRight().length > 0) {
+  //When negative before postfix move spaces from end of format to start of negative symbol
+  while (negativeRightPos > 0 && format.length && format[format.length-1] === ' ') {
     negativeRightSymbol = ' ' + negativeRightSymbol;
-    format = format.slice(0, format.length-1);
+    format = format.slice(0, -1);
   }
 
   var absMask = format;
@@ -110,16 +114,28 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
   // *********************************************************************************
 
   var decimalChar = '', decimalsPart = '', integerPart = '', decimalsSeparator = '', integerSeparator = '';
-  
-  if (format.indexOf('.') > -1) {
-    decimalChar = ".";
-  } else {
-    if (format.indexOf(',') > -1 && format.indexOf(',') === format.lastIndexOf(',')) {
+
+  //if last char is a ',' and there are no other commas then use this as decimal point
+  if (format[format.length-1] === ',' && format.indexOf(',') === format.length-1) {
+    decimalChar = ',';
+  //otherwise use consider '.'
+  } else if (format.indexOf('.') > -1) {
+    if (format.indexOf('.') === format.lastIndexOf('.')) {
+      decimalChar = ".";
+    } else {
+      // two of '.' means this must be the separator, so assume  ',' is the decimal
       decimalChar = ',';
+    }
+  //otherwise use ',' if it exists and there is only one
+  } else if (format.indexOf(',') > -1) {
+    if (format.indexOf(',') === format.lastIndexOf(',')) {
+      decimalChar = ',';
+    } else {
+      decimalChar = '.';
     }
   }
 
-  if (decimalChar) {
+  if (decimalChar && format.indexOf(decimalChar)>-1) {
     decimalsPart = format.slice(format.indexOf(decimalChar)+1);
     integerPart = format.slice(0,format.indexOf(decimalChar));
   } else {
@@ -127,15 +143,23 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     decimalsPart = '';
   }
 
-  //find the thousands/thousanths separators
-  if (integerPart && integerPart.search(/[, ]/) > 0) {
-    integerSeparator = integerPart[integerPart.search(/[, ]/)];
-    integerPart = integerPart.replace(/[, ]/g, "");
+  while (decimalsPart.length && decimalsPart.search(/[., ]$/) > -1) {
+    decimalsPart = decimalsPart.slice(0, -1);
   }
 
-  if (decimalsPart && decimalsPart.search(/[, ]/) > 0) {
-    decimalsSeparator = decimalsPart[decimalsPart.search(/[, ]/)];
-    decimalsPart = decimalsPart.replace(/[, ]/g, "");
+  while (integerPart.length && integerPart[0].search(/[., ]/) > -1) {
+    integerPart = integerPart.slice(1);
+  }
+
+  //find the thousands/thousanths separators
+  if (integerPart && integerPart.search(/[., ]/) > 0) {
+    integerSeparator = integerPart[integerPart.search(/[., ]/)];
+    integerPart = integerPart.replace(/[., ]/g, "");
+  }
+
+  if (decimalsPart && decimalsPart.search(/[., ]/) > 0) {
+    decimalsSeparator = decimalsPart[decimalsPart.search(/[., ]/)];
+    decimalsPart = decimalsPart.replace(/[., ]/g, "");
   }
 
   if ((integerPart.length && !(/^[09#]+$/).exec(integerPart)) || (decimalsPart.length && !(/^[09#]+$/).exec(decimalsPart))) {return false};
