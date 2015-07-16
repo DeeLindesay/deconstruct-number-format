@@ -9,13 +9,13 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
   format=format.trim(); //ignore leading and trailing spaces
   
   // *********************************************************************************
-  // find position and type of negative and contents of prefix and postfix text
+  // find position and type of negative and contents of prefix and suffix text
   // *********************************************************************************
   
   var negativeType = '', negativeRightSymbol = '', negativeLeftSymbol = '',
       negativeRightPos = -1, negativeLeftPos = -1, 
       absFormat,
-      prefix = '', postfix = '';
+      prefix = '', suffix = '';
   
   // brackets as negative
   if (/^([^()]+)?[(]([^09#]+)?[09#., ]+([^)]+)?[)](.+)?$/.test(format)) {
@@ -32,11 +32,11 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     negativeRightPos = format.indexOf(")");
     negativeRightSymbol = ')'
     if (negativeRightPos < format.length-1) { //before prefix
-      postfix = format.slice(negativeRightPos+1);
+      suffix = format.slice(negativeRightPos+1);
       format = format.slice(0, negativeRightPos);
     } else {
-      postfix = format.search(/[^09#,.]([^09#](.+)?)?[)]$/) > -1  ? format.slice(format.search(/[^09#,.]([^09#](.+)?)?[)]$/), -1) : "";
-      format = format.slice(0, format.length - postfix.length - 1);
+      suffix = format.search(/[^09#,.]([^09#](.+)?)?[)]$/) > -1  ? format.slice(format.search(/[^09#,.]([^09#](.+)?)?[)]$/), -1) : "";
+      format = format.slice(0, format.length - suffix.length - 1);
       negativeRightPos = 0;
     }
 
@@ -45,8 +45,8 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     negativeType = 'none';
     prefix = format.search(/[.,]?[09#]/) > 0 ? format.slice(0, format.search(/[.,]?[09#]/)) : "";
     format = format.slice(prefix.length);
-    postfix = format.search(/[^09#,.]([^09#]+|$)/) > -1  ? format.slice(format.search(/[^09#,.]([^09#]+|$)/)) : "";
-    format = format.slice(0, format.length-postfix.length);
+    suffix = format.search(/[^09#,.]([^09#]+|$)/) > -1  ? format.slice(format.search(/[^09#,.]([^09#]+|$)/)) : "";
+    format = format.slice(0, format.length-suffix.length);
 
   } else if (/^([^09#-]+)?-.+$/.test(format)) {
     //negative symbol to left of number (before or after prefix)
@@ -59,22 +59,22 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
       prefix = format.search(/[09#]/) > 0 ? format.slice(1, format.search(/[09#]/)) : "";
     }
     format = format.slice(prefix.length+1);
-    postfix = format.search(/[^09#,.]([^09#]+|$)/) > -1  ? format.slice(format.search(/[^09#,.]([^09#]+|$)/)) : "";
-    format = format.slice(0, format.length-postfix.length);
+    suffix = format.search(/[^09#,.]([^09#]+|$)/) > -1  ? format.slice(format.search(/[^09#,.]([^09#]+|$)/)) : "";
+    format = format.slice(0, format.length-suffix.length);
 
   } else {
-    //negative symbol to right of number (before or after postfix)
+    //negative symbol to right of number (before or after suffix)
     prefix = format.search(/[09#]/) > 0 ? format.slice(0, format.search(/[09#]/)) : "";
     format = format.slice(prefix.length);
     negativeType = 'right';
     negativeRightSymbol = '-'
     negativeRightPos = format.lastIndexOf("-");
-    if (negativeRightPos < format.length-1) { //before postfix
-      postfix = format.slice(negativeRightPos+1);
+    if (negativeRightPos < format.length-1) { //before suffix
+      suffix = format.slice(negativeRightPos+1);
       format = format.slice(0, negativeRightPos);
     } else {
-      postfix = format.search(/[^09#,.]([^09#](.+)?)?-$/) > -1  ? format.slice(format.search(/[^09#,.]([^09#](.+)?)?-$/), format.length-1) : "";
-      format = format.slice(0, format.length - postfix.length - 1);
+      suffix = format.search(/[^09#,.]([^09#](.+)?)?-$/) > -1  ? format.slice(format.search(/[^09#,.]([^09#](.+)?)?-$/), format.length-1) : "";
+      format = format.slice(0, format.length - suffix.length - 1);
       negativeRightPos = 0;
     }
   }
@@ -89,10 +89,10 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     prefix = prefix.slice(1);
   }
 
-  //When negative follows postfix move spaces end of postfix to start of negative symbol
-  while (negativeRightPos === 0 && postfix && postfix[postfix.length-1] === ' ') {
+  //When negative follows suffix move spaces end of suffix to start of negative symbol
+  while (negativeRightPos === 0 && suffix && suffix[suffix.length-1] === ' ') {
     negativeRightSymbol = ' ' + negativeRightSymbol;
-    postfix = postfix.slice(0, -1);
+    suffix = suffix.slice(0, -1);
   }
 
   //When negative follows prefix move spaces from start of format to end of negative symbol
@@ -101,7 +101,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     format = format.slice(1);
   }
 
-  //When negative before postfix move spaces from end of format to start of negative symbol
+  //When negative before suffix move spaces from end of format to start of negative symbol
   while (negativeRightPos > 0 && format.length && format[format.length-1] === ' ') {
     negativeRightSymbol = ' ' + negativeRightSymbol;
     format = format.slice(0, -1);
@@ -184,7 +184,7 @@ exports = module.exports = function deconstructNumberFormat(requiredFormat) {
     negativeRightPos: negativeRightPos,
     negativeLeftSymbol: negativeLeftSymbol,
     negativeRightSymbol: negativeRightSymbol,
-    postfix: postfix,
+    suffix: suffix,
     prefix: prefix,
     absMask: absMask,
     decimalChar: decimalChar,

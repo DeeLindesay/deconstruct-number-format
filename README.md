@@ -4,7 +4,7 @@ To deconstruct a number format eg '-£#,##0.##0 /m', '(33 years)', '$ -99.00' an
 ## Accepts:
 - negative signs before or after prefix text
 - brackets as negative signs
-- prefix and postfix texts
+- prefix and suffix texts
 - `.` or `,` as decimal point
 - space or `.` or `,` as thousand separators
 - space or `.` or `,` as thousanths separators
@@ -12,9 +12,9 @@ To deconstruct a number format eg '-£#,##0.##0 /m', '(33 years)', '$ -99.00' an
 
 ## Returns:
 - negativeType: 'right', 'left', 'brackets', 'none'
-- negativeRightPos: 0 if right negative or bracket is at end of expression, >0 if right/bracket is followed by postfix; -1 no right negative
+- negativeRightPos: 0 if right negative or bracket is at end of expression, >0 if right/bracket is followed by suffix; -1 no right negative
 - negativeLeftPos: 0 if right negative or bracket is at start expression, >0 if right/bracket follows prefix; -1 no left negative
-- postfix: text characters after number; can be ''
+- suffix: text characters after number; can be ''
 - prefix: text characters before number (cannot include 0,9,#); can be ''
 - negativeLeftSymbol: left hand negative symbol (may include trailing spaces), eg '(', '( ', '- '
 - negativeRightSymbol: right hand negative symbol (may include leading spaces), eg ')', ' )', ' -'
