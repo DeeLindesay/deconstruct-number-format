@@ -1,6 +1,6 @@
 {
   "name": "deconstruct-number-format",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "deconstruct a number format eg '-£#,##0.##0' and return a set of parameters to describe the format",
   "main": "index.js",
   "scripts": {
